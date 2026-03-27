@@ -1,0 +1,1270 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
+local StarterGui = game:GetService("StarterGui")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local keyPassed = Instance.new("BindableEvent")
+local attempts = 0
+local correctKey = "Zel$da_X-night"
+
+local keyGui = Instance.new("ScreenGui")
+keyGui.Name = "ZainKeySystem"
+keyGui.ResetOnSpawn = false
+keyGui.DisplayOrder = 1000
+keyGui.IgnoreGuiInset = true
+keyGui.Parent = player:WaitForChild("PlayerGui")
+
+local dimBackground = Instance.new("Frame", keyGui)
+dimBackground.Size = UDim2.fromScale(1, 1)
+dimBackground.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+dimBackground.BackgroundTransparency = 1
+
+local mainKeyFrame = Instance.new("Frame", dimBackground)
+mainKeyFrame.Size = UDim2.new(0, 0, 0, 0)
+mainKeyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainKeyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainKeyFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+mainKeyFrame.BorderSizePixel = 0
+mainKeyFrame.ClipsDescendants = true
+
+local mainCorner = Instance.new("UICorner", mainKeyFrame)
+mainCorner.CornerRadius = UDim.new(0, 15)
+
+local shadow = Instance.new("ImageLabel", mainKeyFrame)
+shadow.Size = UDim2.new(1, 40, 1, 40)
+shadow.Position = UDim2.new(0, -20, 0, -20)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.4
+shadow.ZIndex = 0
+
+local titleLabel = Instance.new("TextLabel", mainKeyFrame)
+titleLabel.Size = UDim2.new(1, 0, 0, 40)
+titleLabel.Position = UDim2.new(0, 0, 0, 10)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "ZAIN HUB - KEY SYSTEM"
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 20
+
+local keyInput = Instance.new("TextBox", mainKeyFrame)
+keyInput.Size = UDim2.new(0.8, 0, 0, 45)
+keyInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+keyInput.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+keyInput.Font = Enum.Font.GothamSemibold
+keyInput.PlaceholderText = "أضف المفتاح هنا..."
+keyInput.PlaceholderColor3 = Color3.fromRGB(200, 200, 200)
+keyInput.Text = ""
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.TextSize = 16
+
+local inputCorner = Instance.new("UICorner", keyInput)
+inputCorner.CornerRadius = UDim.new(0, 10)
+
+task.spawn(function()
+    local colors = {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 255, 255)}
+    local i = 1
+    while keyGui.Parent do
+        local nextI = (i % #colors) + 1
+        local tweenInfo = TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+        local tween = TweenService:Create(keyInput, tweenInfo, {BackgroundColor3 = colors[nextI]})
+        tween:Play()
+        tween.Completed:Wait()
+        i = nextI
+    end
+end)
+
+local checkButton = Instance.new("TextButton", mainKeyFrame)
+checkButton.Size = UDim2.new(0.5, 0, 0, 35)
+checkButton.Position = UDim2.new(0.25, 0, 0.75, 0)
+checkButton.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+checkButton.Font = Enum.Font.GothamBold
+checkButton.Text = "دخول السكربت"
+checkButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+checkButton.TextSize = 16
+
+local btnCorner = Instance.new("UICorner", checkButton)
+btnCorner.CornerRadius = UDim.new(0, 8)
+
+TweenService:Create(dimBackground, TweenInfo.new(0.5), {BackgroundTransparency = 0.5}):Play()
+TweenService:Create(mainKeyFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 350, 0, 180)}):Play()
+
+local function sendNotif(text, duration)
+    StarterGui:SetCore("SendNotification", {Title = "ZAIN HUB ⚠️", Text = text, Duration = duration or 5})
+end
+
+checkButton.MouseButton1Click:Connect(function()
+    if keyInput.Text == correctKey then
+        TweenService:Create(mainKeyFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+        TweenService:Create(dimBackground, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+        task.wait(0.4)
+        keyGui:Destroy()
+        keyPassed:Fire()
+    else
+        attempts = attempts + 1
+        if attempts == 1 then sendNotif("😹 شوف حد يعطيك المفتاح")
+        elseif attempts == 2 then sendNotif("ما تعرف احد راح عليك 😍")
+        elseif attempts == 200 then sendNotif("خذ المفتاح: " .. correctKey, 10)
+        elseif attempts > 200 then sendNotif("شكلك مسكين اخرج احسن 🫢")
+        else sendNotif("لو غلتط 200 مره بعطيك المفتاح 😍😹") end
+    end
+end)
+
+keyPassed.Event:Wait()
+
+local music = Instance.new("Sound")
+music.SoundId = "rbxassetid://15747597375"
+music.Volume = 0.5
+music.Parent = SoundService
+music:Play()
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ZainLoadingScreen"
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999
+gui.IgnoreGuiInset = true 
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromScale(1.2, 1.2)
+main.Position = UDim2.fromScale(-0.1, -0.1)
+main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+main.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.fromScale(0.8, 0.15)
+title.Position = UDim2.fromScale(0.1, 0.35)
+title.Text = "Zenix Nova Hub"
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 60
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.BackgroundTransparency = 1
+
+local barBg = Instance.new("Frame", main)
+barBg.Size = UDim2.fromScale(0.4, 0.015)
+barBg.Position = UDim2.fromScale(0.3, 0.6)
+barBg.BackgroundColor3 = Color3.fromRGB(25, 30, 45)
+barBg.BorderSizePixel = 0
+local corner = Instance.new("UICorner", barBg)
+corner.CornerRadius = UDim.new(1, 0)
+
+local bar = Instance.new("Frame", barBg)
+bar.Size = UDim2.fromScale(0, 1)
+bar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+bar.BorderSizePixel = 0
+local barCorner = Instance.new("UICorner", bar)
+barCorner.CornerRadius = UDim.new(1, 0)
+
+task.spawn(function()
+    local colors = {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 255, 255)}
+    local i = 1
+    while gui.Parent do
+        local nextColor = colors[(i % #colors) + 1]
+        TweenService:Create(title, TweenInfo.new(1.2, Enum.EasingStyle.Linear), {TextColor3 = nextColor}):Play()
+        TweenService:Create(bar, TweenInfo.new(1.2, Enum.EasingStyle.Linear), {BackgroundColor3 = nextColor}):Play()
+        task.wait(1.2)
+        i = i + 1
+    end
+end)
+
+local barTween = TweenService:Create(bar, TweenInfo.new(5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.fromScale(1, 1)})
+barTween:Play()
+barTween.Completed:Wait()
+task.wait(0.5)
+
+music:Stop()
+music:Destroy()
+TweenService:Create(main, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
+for _, v in ipairs(main:GetDescendants()) do
+    if v:IsA("TextLabel") then TweenService:Create(v, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+    elseif v:IsA("Frame") then TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play() end
+end
+task.wait(0.8)
+gui:Destroy()
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+_G.ZainRainbow = false 
+_G.ZainCustomColors = true 
+_G.ColorSpeed = 10 
+
+local lp = game:GetService("Players").LocalPlayer
+local Remotes = ReplicatedStorage:WaitForChild("Remotes", 5)
+
+local bangEnabled, faceSitEnabled, combinedEnabled, antiSitEnabled, antiFlingAll, antiGlitchEnabled, holdSixTools = false, false, false, false, false, false, false
+local bangTarget, targetName, originalCFrame, currentMusicID, copyTarget, SavedOldPos, killTarget = nil, "", nil, "", nil, nil, nil
+local GlobalGuardianActive = false
+_G.GlobalPurge = false
+local TargetBangV2Enabled, FaceBangV2Enabled, TargetBangV2Connection, FaceBangV2Connection, BangOriginalPos = false, false, nil, nil, nil
+local ClearAreaEnabled, ClearAreaOriginalPos, ClearAreaThread, ClearAreaPhysics = false, nil, nil, nil
+local SavedLocation = nil 
+
+local customColors = {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 0, 255), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255)}
+
+local function playMusic(soundId, skateType) 
+    pcall(function() 
+        local vehicleEvent = game:GetService("ReplicatedStorage"):WaitForChild("RE", 2):FindFirstChild("1NoMoto1rVehicle1s"); 
+        if vehicleEvent then 
+            vehicleEvent:FireServer(skateType or "SkateBoard"); 
+            task.wait(0.4); 
+            vehicleEvent:FireServer("PickingScooterMusicText", tostring(soundId)) 
+        end 
+    end) 
+end
+
+local function AbsoluteNuke(v)
+    if not _G.GlobalPurge then return end
+    pcall(function()
+        if v:IsA("Humanoid") or v:IsA("Terrain") or v:IsA("Shirt") or v:IsA("Pants") then return end
+        if v.Name == "Baseplate" or v.Name == "Road" then return end
+        if v:IsDescendantOf(lp.Character) and not v:IsA("Tool") then return end
+        if v:IsA("Tool") or v:IsA("HopperBin") or v:IsA("Light") or v:IsA("PointLight") or v:IsA("SpotLight") or v:IsA("SurfaceLight") or v:IsA("ParticleEmitter") or v:IsA("Explosion") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Decal") or v:IsA("Texture") then v:Destroy() return end
+        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic; v.CastShadow = false; v.Reflectance = 0 end
+    end)
+end
+
+workspace.DescendantAdded:Connect(function(child) if _G.GlobalPurge then task.wait() AbsoluteNuke(child) end end)
+task.spawn(function() while true do if _G.GlobalPurge then collectgarbage("collect") end task.wait(2) end end)
+
+local function GetPlayerMatch(text)
+    local searchText = text:lower()
+    for _, p in pairs(Players:GetPlayers()) do
+        if p.Name:lower():sub(1, #searchText) == searchText or p.DisplayName:lower():sub(1, #searchText) == searchText then
+            if p ~= lp then return p end
+        end
+    end
+    return nil
+end
+
+local function EquipSixSimultaneously()
+    if not lp.Character then return end
+    local tools = lp.Backpack:GetChildren()
+    local count = 0
+    for _, tool in ipairs(tools) do
+        if tool:IsA("Tool") and count < 6 then tool.Parent = lp.Character; count = count + 1 end
+    end
+end
+
+local function CreateZainTitles(character)
+    if not character then return end
+    local head = character:WaitForChild("Head", 10)
+    if head:FindFirstChild("ZainTags") then head.ZainTags:Destroy() end
+    local billboard = Instance.new("BillboardGui", head)
+    billboard.Name = "ZainTags"
+    billboard.Size = UDim2.new(0, 400, 0, 120)
+    billboard.AlwaysOnTop = true
+    billboard.ExtentsOffset = Vector3.new(0, 5, 0)
+    local mainTitle = Instance.new("TextLabel", billboard)
+    mainTitle.BackgroundTransparency = 1; mainTitle.Size = UDim2.new(1, 0, 0.5, 0)
+    mainTitle.Text = "🔥👹 ZAIN HUB 👹🔥"; mainTitle.TextColor3 = Color3.fromRGB(255, 0, 0)
+    mainTitle.TextScaled = true; mainTitle.Font = Enum.Font.FredokaOne
+    local subTitle = Instance.new("TextLabel", billboard)
+    subTitle.BackgroundTransparency = 1; subTitle.Position = UDim2.new(0, 0, 0.5, 0)
+    subTitle.Size = UDim2.new(1, 0, 0.35, 0)
+    subTitle.Text = "مطور سكربت Zain"; subTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    subTitle.TextScaled = true; subTitle.Font = Enum.Font.SourceSansBold
+end
+
+local function copyAvatar(TPlayer)
+    if not TPlayer or not TPlayer.Character then Rayfield:Notify({Title = "خطأ", Content = "اللاعب غير موجود!", Duration = 3}) return end
+    local LHumanoid = lp.Character:FindFirstChildOfClass("Humanoid")
+    local THumanoid = TPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if not LHumanoid or not THumanoid or not Remotes then return end
+    Rayfield:Notify({Title = "نسخ سكنات", Content = "جاري النسخ الكامل...", Duration = 3})
+    task.spawn(function()
+        pcall(function()
+            local LDesc = LHumanoid:GetAppliedDescription()
+            for _, acc in ipairs(LDesc:GetAccessories(true)) do Remotes.Wear:InvokeServer(tonumber(acc.AssetId)); task.wait(0.1) end
+            Remotes.Wear:InvokeServer(0)
+            task.wait(0.5)
+            local PDesc = THumanoid:GetAppliedDescription()
+            local argsBody = {[1] = {[1] = PDesc.Torso, [2] = PDesc.RightArm, [3] = PDesc.LeftArm, [4] = PDesc.RightLeg, [5] = PDesc.LeftLeg, [6] = PDesc.Head}}
+            Remotes.ChangeCharacterBody:InvokeServer(unpack(argsBody))
+            local skin = TPlayer.Character:FindFirstChild("Body Colors")
+            if skin then Remotes.ChangeBodyColor:FireServer(tostring(skin.HeadColor)) end
+            task.wait(0.3)
+            if PDesc.Shirt ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Shirt)); task.wait(0.2) end
+            if PDesc.Pants ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Pants)); task.wait(0.2) end
+            if PDesc.Face ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Face)); task.wait(0.2) end
+            for _, v in ipairs(PDesc:GetAccessories(true)) do if v.AssetId ~= 0 then Remotes.Wear:InvokeServer(tonumber(v.AssetId)); task.wait(0.2) end end
+            Rayfield:Notify({Title = "نجاح", Content = "تم نسخ سكن " .. TPlayer.DisplayName .. " بنجاح!", Duration = 3})
+        end)
+    end)
+end
+
+local function ApplyZainIdentity()
+    pcall(function()
+        local RE = ReplicatedStorage:WaitForChild("RE", 5)
+        if RE then 
+            RE:FindFirstChild("1RPNam1eTex1t"):FireServer("RolePlayName", "Žέήίx ήόνά ħùв") 
+            RE:FindFirstChild("1RPNam1eTex1t"):FireServer("RolePlayBio", "آلصہآنہع آلمہطہور زيہنہ") 
+        end
+    end)
+end
+
+task.spawn(function() if not game:IsLoaded() then game.Loaded:Wait() end task.wait(1) ApplyZainIdentity() end)
+
+-- نظام الألوان الموحد للاسم والبايو معاً
+task.spawn(function()
+    local t = 0
+    while true do
+        pcall(function()
+            local RE = ReplicatedStorage:FindFirstChild("RE")
+            if RE then
+                local speedMult = _G.ColorSpeed / 5 
+                t = t + (0.05 * speedMult)
+                
+                if _G.ZainRainbow then
+                    local color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                    RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPNameColor", color)
+                    RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPBioColor", color)
+                elseif _G.ZainCustomColors then
+                    local index1 = (math.floor(t) % #customColors) + 1
+                    local index2 = (index1 % #customColors) + 1
+                    local color = customColors[index1]:Lerp(customColors[index2], t % 1)
+                    RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPNameColor", color)
+                    RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPBioColor", color)
+                end
+            end
+        end)
+        task.wait(0.05)
+    end
+end)
+
+RunService.Stepped:Connect(function()
+    pcall(function()
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp, hum = lp.Character.HumanoidRootPart, lp.Character:FindFirstChild("Humanoid")
+            if antiGlitchEnabled then
+                hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                local params = OverlapParams.new()
+                params.FilterType = Enum.RaycastFilterType.Exclude
+                params.FilterDescendantsInstances = {lp.Character}
+                for _, obj in pairs(workspace:GetPartBoundsInRadius(hrp.Position, 30, params)) do
+                    if obj:IsA("BasePart") then
+                        if not (Players:GetPlayerFromCharacter(obj.Parent) or Players:GetPlayerFromCharacter(obj.Parent.Parent)) then
+                            if obj:FindFirstAncestorOfClass("VehicleSeat") or obj.Name:lower():find("car") or obj.AssemblyLinearVelocity.Magnitude > 15 then obj.CanCollide = false end
+                        end
+                    end
+                end
+            end
+            if antiSitEnabled and hum then hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false); hum.Sit = false end
+            if antiFlingAll then for _, part in pairs(lp.Character:GetDescendants()) do if part:IsA("BasePart") then part.CanCollide = false end end end
+        end
+    end)
+end)
+
+RunService.Heartbeat:Connect(function()
+    pcall(function()
+        if (bangEnabled or faceSitEnabled or combinedEnabled) and bangTarget and bangTarget.Character then
+            local targetChar = bangTarget.Character
+            local targetHRP = targetChar:FindFirstChild("HumanoidRootPart")
+            if not targetHRP then return end
+            if not originalCFrame then originalCFrame = lp.Character.HumanoidRootPart.CFrame end
+            local hrp = lp.Character.HumanoidRootPart
+            if holdSixTools then EquipSixSimultaneously() end
+            local wave = math.sin(tick() * 55) 
+            local deepRecoil, normalRecoil = wave * 4.5, wave * 2.5
+            hrp.Velocity = Vector3.new(0, 0, 0)
+            for _, v in pairs(lp.Character:GetChildren()) do if v:IsA("BasePart") then v.CanCollide = false end end
+            if combinedEnabled then
+                if math.floor(tick() * 60) % 2 == 0 then lp.Character.Humanoid.Sit = true; hrp.CFrame = targetChar.Head.CFrame * CFrame.new(0, -0.6, deepRecoil) * CFrame.Angles(0, math.rad(180), 0)
+                else lp.Character.Humanoid.Sit = false; hrp.CFrame = targetHRP.CFrame * CFrame.new(0, 0.5, deepRecoil + 1.5) end
+            elseif faceSitEnabled then lp.Character.Humanoid.Sit = true; hrp.CFrame = targetChar.Head.CFrame * CFrame.new(0, -0.6, deepRecoil) * CFrame.Angles(0, math.rad(180), 0)
+            elseif bangEnabled then lp.Character.Humanoid.Sit = false; hrp.CFrame = targetHRP.CFrame * CFrame.new(0, 0.5, normalRecoil + 1.2) end
+        else
+            if originalCFrame then lp.Character.HumanoidRootPart.CFrame = originalCFrame; originalCFrame = nil; lp.Character.Humanoid.Sit = false end
+        end
+    end)
+end)
+
+local Window = Rayfield:CreateWindow({Name = "Žέήίx ήόνά ħùв", LoadingTitle = "تحميل...", LoadingSubtitle = "جاري تفعيل نظام زين المطور..", ConfigurationSaving = { Enabled = true, FolderName = "ZainHubConfig", FileName = "ZainMain" }, KeySystem = false})
+
+local MainTab = Window:CreateTab("الصفحة الرئيسيه ✨", 4483362458)
+local PlayerTab = Window:CreateTab("الاعب 👤", 4483362458)
+local MusicTab = Window:CreateTab("الاغاني 🎵", 4483362458)
+local BangTab = Window:CreateTab("البانق 💥", 4483362458)
+local FunTab = Window:CreateTab("المتعه 🎭", 4483362458)
+local AntiTab = Window:CreateTab("المضادات 🛡️", 10734952036)
+
+-- تعريف السلايدرات لمزامنتها مع بعض
+local ColorSpeedSliderMain
+local ColorSpeedSliderPlayer
+local updatingSlider = false
+
+MainTab:CreateSection("إعدادات الهوية والألوان (Žέήίx ήόνά ħùв)")
+MainTab:CreateButton({Name = "تفعيل الألقاب الملكية (أحمر) 🔥", Callback = function() CreateZainTitles(lp.Character) end})
+
+ColorSpeedSliderMain = MainTab:CreateSlider({
+    Name = "⚡ سرعة الألوان (1-200) ⚡", 
+    Range = {1, 200}, 
+    Increment = 1, 
+    CurrentValue = 10, 
+    Callback = function(v) 
+        if updatingSlider then return end
+        _G.ColorSpeed = v 
+        if ColorSpeedSliderPlayer then
+            updatingSlider = true
+            ColorSpeedSliderPlayer:Set(v)
+            updatingSlider = false
+        end
+    end 
+})
+
+MainTab:CreateToggle({ Name = "ألوان زين السلسة (مدمج الاسم والبايو) ✨", CurrentValue = true, Callback = function(Value) _G.ZainCustomColors = Value if Value then _G.ZainRainbow = false end end })
+MainTab:CreateToggle({ Name = "تفعيل رينبو الاسم العادي 🌈", CurrentValue = false, Callback = function(Value) _G.ZainRainbow = Value if Value then _G.ZainCustomColors = false end end })
+MainTab:CreateButton({ Name = "تحديث الاسم والبايو يدوياً", Callback = function() ApplyZainIdentity() end })
+
+MainTab:CreateSection("نظام نسخ السكنات المطور (Brookhaven)")
+MainTab:CreateInput({ Name = "اكتب اسم اللاعب للنسخ", PlaceholderText = "البحث من اليسار...", Callback = function(text) copyTarget = GetPlayerMatch(text) if copyTarget then Rayfield:Notify({ Title = "نسخ سكنات", Content = "تم تحديد: " .. copyTarget.DisplayName, Duration = 3 }) end end })
+MainTab:CreateButton({ Name = "✅ نسخ كامل (جسم + ملابس)", Callback = function() if copyTarget then copyAvatar(copyTarget) else Rayfield:Notify({Title = "خطأ", Content = "اختر لاعب أولاً!", Duration = 3}) end end })
+MainTab:CreateButton({ Name = "👤 نسخ جسم اللاعب المختار فقط", Callback = function() if not copyTarget or not copyTarget.Character then Rayfield:Notify({Title = "خطأ", Content = "اختر لاعب أولاً!", Duration = 3}) return end pcall(function() local THumanoid = copyTarget.Character:FindFirstChildOfClass("Humanoid") local PDesc = THumanoid:GetAppliedDescription() Remotes.ChangeCharacterBody:InvokeServer(unpack({[1] = {[1] = PDesc.Torso, [2] = PDesc.RightArm, [3] = PDesc.LeftArm, [4] = PDesc.RightLeg, [5] = PDesc.LeftLeg, [6] = PDesc.Head}})) local skin = copyTarget.Character:FindFirstChild("Body Colors") if skin then Remotes.ChangeBodyColor:FireServer(tostring(skin.HeadColor)) end Rayfield:Notify({Title = "نجاح", Content = "تم نسخ الجسم بنجاح!", Duration = 3}) end) end })
+MainTab:CreateButton({ Name = "👕 نسخ ملابس اللاعب المختار فقط", Callback = function() if not copyTarget or not copyTarget.Character then Rayfield:Notify({Title = "خطأ", Content = "اختر لاعب أولاً!", Duration = 3}) return end pcall(function() local THumanoid = copyTarget.Character:FindFirstChildOfClass("Humanoid") local PDesc = THumanoid:GetAppliedDescription() if PDesc.Shirt ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Shirt)); task.wait(0.1) end if PDesc.Pants ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Pants)); task.wait(0.1) end if PDesc.Face ~= 0 then Remotes.Wear:InvokeServer(tonumber(PDesc.Face)); task.wait(0.1) end for _, v in ipairs(PDesc:GetAccessories(true)) do if v.AssetId ~= 0 then Remotes.Wear:InvokeServer(tonumber(v.AssetId)); task.wait(0.1) end end Rayfield:Notify({Title = "نجاح", Content = "تم نسخ الملابس بنجاح!", Duration = 3}) end) end })
+MainTab:CreateButton({ Name = "❌ حذف جميع الملابس (تصفير)", Callback = function() pcall(function() local LDesc = lp.Character:FindFirstChildOfClass("Humanoid"):GetAppliedDescription() for _, acc in ipairs(LDesc:GetAccessories(true)) do Remotes.Wear:InvokeServer(tonumber(acc.AssetId)) task.wait(0.05) end Remotes.Wear:InvokeServer(0) Rayfield:Notify({Title = "تصفير", Content = "تم حذف جميع الملابس والإكسسوارات", Duration = 3}) end) end })
+
+PlayerTab:CreateSection("تحكم بخصائص اللاعب")
+PlayerTab:CreateSlider({Name = "سرعة الاعب", Range = {0, 1000}, Increment = 1, CurrentValue = 16, Callback = function(Value) pcall(function() lp.Character.Humanoid.WalkSpeed = Value end) end})
+PlayerTab:CreateButton({Name = "اعادة السرعه", Callback = function() pcall(function() lp.Character.Humanoid.WalkSpeed = 16 end) end})
+PlayerTab:CreateSlider({Name = "القفز", Range = {0, 500}, Increment = 1, CurrentValue = 0, Callback = function(Value) pcall(function() lp.Character.Humanoid.UseJumpPower = true; lp.Character.Humanoid.JumpPower = Value end) end})
+PlayerTab:CreateButton({Name = "اعاداة القفز الطبيعي", Callback = function() pcall(function() lp.Character.Humanoid.UseJumpPower = true; lp.Character.Humanoid.JumpPower = 50 end) end})
+PlayerTab:CreateSlider({Name = "جرافيتي", Range = {0, 200}, Increment = 1, CurrentValue = 196, Callback = function(Value) workspace.Gravity = Value end})
+PlayerTab:CreateButton({Name = "اعادة الجرافيتي", Callback = function() workspace.Gravity = 196.2 end})
+
+ColorSpeedSliderPlayer = PlayerTab:CreateSlider({
+    Name = "⚡ سرعة الألوان (1-200) ⚡", 
+    Range = {1, 200}, 
+    Increment = 1, 
+    CurrentValue = 10, 
+    Callback = function(v) 
+        if updatingSlider then return end
+        _G.ColorSpeed = v 
+        if ColorSpeedSliderMain then
+            updatingSlider = true
+            ColorSpeedSliderMain:Set(v)
+            updatingSlider = false
+        end
+    end
+})
+
+local RpColors = {
+    {"1 اسود و ابيض", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 255, 255)}},
+    {"2 اسود و احمر", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 0, 0)}},
+    {"3 اسود و اخضر", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 255, 0)}},
+    {"4 اسود و اصفر", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 255, 0)}},
+    {"5 اسود و بنبي", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 105, 180)}},
+    {"6 اسود و بنفسجي", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(128, 0, 128)}},
+    {"7 اسود و لبني", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 255, 255)}},
+    {"8 اسود و ازرق", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(0, 0, 255)}},
+    {"9 اسود و ذهبي", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 215, 0)}},
+    {"10 اسود و برتقالي", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 165, 0)}},
+    {"11 اسود و زيتي", {Color3.fromRGB(0, 0, 0), Color3.fromRGB(128, 128, 0)}},
+    {"12 ابيض و احمر", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 0, 0)}},
+    {"13 ابيض و اخضر", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 255, 0)}},
+    {"14 ابيض و اصفر", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 0)}},
+    {"15 ابيض و بنبي", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 105, 180)}},
+    {"16 ابيض و بنفسجي", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(128, 0, 128)}},
+    {"17 ابيض و لبني", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 255, 255)}},
+    {"18 ابيض و ازرق", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 0, 255)}},
+    {"19 ابيض و ذهبي", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 215, 0)}},
+    {"20 ابيض و زيتي", {Color3.fromRGB(255, 255, 255), Color3.fromRGB(128, 128, 0)}},
+    {"21 احمر و اخضر", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0)}},
+    {"22 احمر و اصفر", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 255, 0)}},
+    {"23 احمر و بنبي", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 105, 180)}},
+    {"24 احمر و بنفسجي", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(128, 0, 128)}},
+    {"25 احمر و لبني", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 255)}},
+    {"26 احمر و ازرق", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 0, 255)}},
+    {"27 احمر و ذهبي", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 215, 0)}},
+    {"28 احمر و زيتي", {Color3.fromRGB(255, 0, 0), Color3.fromRGB(128, 128, 0)}},
+    {"29 اخضر و اصفر", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(255, 255, 0)}},
+    {"30 اخضر و بنبي", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(255, 105, 180)}},
+    {"31 اخضر و بنفسجي", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(128, 0, 128)}},
+    {"32 اخضر و لبني", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 255, 255)}},
+    {"33 اخضر و ازرق", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255)}},
+    {"34 اخضر و ذهبي", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(255, 215, 0)}},
+    {"35 اخضر و زيتي", {Color3.fromRGB(0, 255, 0), Color3.fromRGB(128, 128, 0)}},
+    {"36 اصفر و بنبي", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 105, 180)}},
+    {"37 اصفر و بنفسجي", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(128, 0, 128)}},
+    {"38 اصفر و لبني", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(0, 255, 255)}},
+    {"39 اصفر و ازرق", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(0, 0, 255)}},
+    {"40 اصفر و ذهبي", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 215, 0)}},
+    {"41 اصفر و زيتي", {Color3.fromRGB(255, 255, 0), Color3.fromRGB(128, 128, 0)}},
+    {"42 بنبي و بنفسجي", {Color3.fromRGB(255, 105, 180), Color3.fromRGB(128, 0, 128)}},
+    {"43 بنبي و لبني", {Color3.fromRGB(255, 105, 180), Color3.fromRGB(0, 255, 255)}},
+    {"44 بنبي و ازرق", {Color3.fromRGB(255, 105, 180), Color3.fromRGB(0, 0, 255)}},
+    {"45 بنبي و ذهبي", {Color3.fromRGB(255, 105, 180), Color3.fromRGB(255, 215, 0)}},
+    {"46 بنبي و زيتي", {Color3.fromRGB(255, 105, 180), Color3.fromRGB(128, 128, 0)}},
+    {"47 بنفسجي و لبني", {Color3.fromRGB(128, 0, 128), Color3.fromRGB(0, 255, 255)}},
+    {"49 بنفسجي و ازرق", {Color3.fromRGB(128, 0, 128), Color3.fromRGB(0, 0, 255)}},
+    {"50 بنفسجي و ذهبي", {Color3.fromRGB(128, 0, 128), Color3.fromRGB(255, 215, 0)}},
+    {"51 بنفسجي و زيتي", {Color3.fromRGB(128, 0, 128), Color3.fromRGB(128, 128, 0)}},
+    {"52 لبني و ازرق", {Color3.fromRGB(0, 255, 255), Color3.fromRGB(0, 0, 255)}},
+    {"53 لبني و ذهبي", {Color3.fromRGB(0, 255, 255), Color3.fromRGB(255, 215, 0)}},
+    {"54 لبني و زيتي", {Color3.fromRGB(0, 255, 255), Color3.fromRGB(128, 128, 0)}},
+    {"55 ازرق و ذهبي", {Color3.fromRGB(0, 0, 255), Color3.fromRGB(255, 215, 0)}},
+    {"56 ازرق و زيتي", {Color3.fromRGB(0, 0, 255), Color3.fromRGB(128, 128, 0)}}
+}
+
+PlayerTab:CreateSection("الوان الـ RP والبايو الملكية 👑")
+for _, colorData in ipairs(RpColors) do 
+    PlayerTab:CreateToggle({Name = colorData[1], CurrentValue = false, Callback = function(Value) 
+        if Value then customColors = colorData[2]; _G.ZainCustomColors = true; _G.ZainRainbow = false end 
+    end}) 
+end
+
+MusicTab:CreateSection("ادخل كود خاص")
+MusicTab:CreateInput({ 
+    Name = "كود يدوي", 
+    PlaceholderText = "ID هنا", 
+    Callback = function(v) currentMusicID = v end 
+})
+
+MusicTab:CreateButton({ Name = "▶️ تشغيل (عادي)", Callback = function() if currentMusicID ~= "" then playMusic(currentMusicID, "SkateBoard") end end })
+MusicTab:CreateButton({ Name = "✨ تشغيل (بريميوم)", Callback = function() if currentMusicID ~= "" then playMusic(currentMusicID, "Haverboard") end end })
+
+MusicTab:CreateSection("اغاني عشوائية")
+for name, id in pairs({ 
+    ["افخم فونك"] = "17647322226", ["فونك غضب"] = "115859025716354", ["فونك عالمي"] = "76578817848504", ["فونك ممتاز"] = "102402883551679", ["فونك ازعاج"] = "85682109892034"
+}) do MusicTab:CreateButton({Name = name, Callback = function() playMusic(id) end}) end
+
+MusicTab:CreateSection("اغاني عراقيه")
+for _, data in ipairs({
+    {"راب عراقي 🧩", "116272643488592"}, {"اخذت بدنيا تعناط ودروس(حزين) 🙁", "112254940188047"}, {"شراره 🎻", "81023003196738"}, {"عراقي 🔥", "116815742960163"}, {"عراقي حب ❤", "105956659839019"}, 
+    {"فنان 🎸", "130012558337510"}, {"فنان راب 2 🔥🎤", "80945632184135"}, {"عراقي ابشرك (حزيز)🔥❤", "82396938710161"}, {"ميت انا من فراقك ❤🔥", "98313375960954"}, {"دم حزني (حزينه)", "99123490695024"}, 
+    {"الحجني يا شرطي 👾🔥", "120675895107276"}, {"الف صلاه عليك يا محمد", "103786200526639"}, {"ريمكس عراقي 🔥", "136909019669593"}, {"شعر عراقي 🎼", "83309655997452"}, {"وش علينا من الناس 🎲", "81808954656328"}, 
+    {"ازعاج قوي للصليب 🔥🎺", "91138951626248"}, {"ازعاج عراقي", "127840997774724"}, {"عراقي حزين 🔥", "106271890575602"}, {"عود عراقي 🎼", "94546035218751"}, {"قول الصواري نا🔥", "135009652401688"},
+    {"قررنا رحيلك واخترنا بديلك", "87510423075068"}, {"حلوه 👍🤗", "77951452994771"}, {"اتبوس ايدي 🔥(حزين)", "80039364766636"}, {"سبحيني بلمشائر 🔥", "80017487709494"}, {"غرقت بحبو 🔥", "118850051381032"},
+    {"تراني سكران 😂😂", "111811908070601"}, {"ازعاج صردع وهيبه 🔥", "72369698229901"}
+}) do MusicTab:CreateButton({Name = data[1], Callback = function() playMusic(data[2]) end}) end
+
+MusicTab:CreateSection("اغاني سب لا انصح بيها")
+for _, data in ipairs({
+    {"سب 1", "91611648163631"}, {"كشلي امك", "71491005545506"}, {"كسر كى*ك يا اجنبي", "79928045539255"}, {"العن الق*به ياوز الق*به", "131006804177346"}, {"متجيش مع واحد شر**ط", "99113135294997"}, 
+    {"سب بهجت صابر", "6713993281"}, {"كى**ك يا حلبي", "7942547789"}, {"سب 2", "131794008455004"}, {"سب 3", "88304661583351"}, {"سب 4", "94943308357738"}, {"ارسل كلمة كس", "6536444735"}, {"يابن القحبه", "5849978429"}
+}) do MusicTab:CreateButton({Name = data[1], Callback = function() playMusic(data[2]) end}) end
+
+MusicTab:CreateSection("اغاني اجنبيه")
+for _, data in ipairs({
+    {"اجنبيه 😂💔", "70782176012619"}, {"اجنبي حزين", "72320758533508"}, {"حلوه", "130721206402716"}, {"حلوه 2", "136869502216760"}, {"فونك اجنبي 🔥", "130721206402716"}, {"قوية 🔥", "103288558732219"}, 
+    {"كرسمس", "135528953872601"}, {"فونك", "111205815697819"}, {"جامده 1", "127775034804421"}, {"جامده 2", "135454681412242"}, {"جامده 3", "127491720343331"}, {"حلوه", "87373439541502"}, {"حلوه 2", "134428821234710"}, 
+    {"فونك", "105559121714790"}, {"اغنية اكل نم نم نم", "95489036869789"}, {"ريمكس اجنبي", "120871403922972"}, {"ريمكس 🔥", "92959057847076"}, {"اجنبيه 🔥", "100347006440953"}, {"فونك GTA", "109337680029292"},
+    {"فونك قوي 🔥🔥", "138361625716987"}, {"فونك", "137478052262430"}, {"فونك", "101168804316649"}, {"فونك", "131415306381990"}, {"فونك خطير 🔥", "92165865063521"}, {"my money", "1846687233"}
+}) do MusicTab:CreateButton({Name = data[1], Callback = function() playMusic(data[2]) end}) end
+
+MusicTab:CreateSection("الاغاني العربيه | المصريه")
+for _, data in ipairs({
+    {"مصريه 🔥🔥", "128624259208020"}, {"رمضان برودكشن 👾", "123555966146480"}, {"دمرتي حياتي", "124482316940059"}, {"راب", "8559374146822"}, {"جامده ❤", "106941936452890"}, {"جامده ❤2 ", "107471923441527"}, 
+    {"تصدق كرهتك", "113478978326245"}, {"كارزما وفد شي ينحب", "89189069089618"}, {"الله الله يا جمالك ❤", "102463539890606"}, {"اكبر غلطه بحياتي", "127085435747898"}, {"اه يا حلو", "93620598835551"}, 
+    {"اتركيني جامده", "131870431323817"}, {"سيبتيني فين كلامك (حزين)", "136793917774554"}, {"ليه جي (حزين)", "92304349905750"}, {"فارس سكر", "115153161936086"}, {"هات الدكتور علشان يخيط", "8776769631"}, 
+    {"اغنية بنت 🔥", "118359337959122"}, {"راب فكني منها", "125880160870644"}, {"كل مبتعب بلعن نفسي", "71913003203436"}, {"كترزما وفد شي ينحب", "89189069089618"}, {"اول مره حياتي تورد", "122957821960545"}, 
+    {"علي كيفك 🔥", "123487073954032"}, {"حلوه 😂", "134833118817796"}
+}) do MusicTab:CreateButton({Name = data[1], Callback = function() playMusic(data[2]) end}) end
+
+MusicTab:CreateSection("اغاني ازعاج كل")
+for _, data in ipairs({
+    {"get out", "99796748877356"}, {"علي البي", "105438850576001"}, {"مو متذكر اسمها", "97439414907139"}, {"ازعاج فونك", "120576436665675"}
+}) do MusicTab:CreateButton({Name = data[1], Callback = function() playMusic(data[2]) end}) end
+
+BangTab:CreateSection("نظام السحب العميق (Deep Recoil 1,000,000)")
+BangTab:CreateInput({ Name = "اسم الهدف", PlaceholderText = "البحث من اليسار...", Callback = function(Text) bangTarget = GetPlayerMatch(Text) if bangTarget then Rayfield:Notify({Title = "رادار", Content = "تم قفل الهدف: " .. bangTarget.DisplayName, Duration = 3}) end end })
+BangTab:CreateToggle({ Name = "وضع الدمج 🌀", CurrentValue = false, Callback = function(v) combinedEnabled = v; holdSixTools = false if v then bangEnabled, faceSitEnabled = false, false end end })
+BangTab:CreateToggle({ Name = "بانق خلفي 🍑", CurrentValue = false, Callback = function(v) bangEnabled = v; holdSixTools = false if v then combinedEnabled, faceSitEnabled = false, false end end })
+BangTab:CreateToggle({ Name = "فيس سيت 👅", CurrentValue = false, Callback = function(v) faceSitEnabled = v; holdSixTools = false if v then combinedEnabled, bangEnabled = false, false end end })
+BangTab:CreateSection("🛠️ هجوم الـ 6 أدوات معاً 🛠️")
+BangTab:CreateToggle({ Name = "وضع الدمج (6 أدوات) 🌀", CurrentValue = false, Callback = function(v) combinedEnabled = v; holdSixTools = v if v then bangEnabled, faceSitEnabled = false, false end end })
+BangTab:CreateToggle({ Name = "بانق خلفي (6 أدوات) 🍑", CurrentValue = false, Callback = function(v) bangEnabled = v; holdSixTools = v if v then combinedEnabled, faceSitEnabled = false, false end end })
+BangTab:CreateToggle({ Name = "فيس سيت (6 أدوات) 👅", CurrentValue = false, Callback = function(v) faceSitEnabled = v; holdSixTools = v if v then combinedEnabled, bangEnabled = false, false end end })
+BangTab:CreateButton({ Name = "اجمع 6 مع بعض ⚔️", Callback = function() EquipSixSimultaneously() Rayfield:Notify({Title = "جاهز", Content = "تم تجهيز 6 أدوات للهجوم!", Duration = 3}) end })
+BangTab:CreateSection("⚠️ أنظمة البانق V2 الجديدة (استهداف مباشر) ⚠️")
+BangTab:CreateToggle({ Name = "تفعيل بانق v2 كل الجسد 💥", CurrentValue = false, Flag = "TargetFlingV2", Callback = function(Value)
+    TargetBangV2Enabled = Value
+    local char, hrp, hum = lp.Character, lp.Character and lp.Character:FindFirstChild("HumanoidRootPart"), lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if TargetBangV2Enabled then
+        if not bangTarget or not bangTarget.Character then TargetBangV2Enabled = false; return end
+        BangOriginalPos = hrp.CFrame; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        TargetBangV2Connection = RunService.Heartbeat:Connect(function()
+            if not TargetBangV2Enabled or not bangTarget.Character then return end
+            local targetParts = {}
+            for _, p in pairs(bangTarget.Character:GetChildren()) do if p:IsA("BasePart") then table.insert(targetParts, p) end end
+            local randomPart = targetParts[math.random(1, #targetParts)]
+            if not randomPart then return end
+            for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = false end end
+            hrp.CFrame = randomPart.CFrame * CFrame.new(Vector3.new(math.random(-1,1), math.random(-1,1), math.random(-1,1))) * CFrame.Angles(math.rad(math.random(0,360)), math.rad(math.random(0,360)), math.rad(math.random(0,360)))
+            hrp.Velocity, hrp.RotVelocity = Vector3.new(20000, 20000, 20000), Vector3.new(50000, 50000, 50000)
+        end)
+    else
+        if TargetBangV2Connection then TargetBangV2Connection:Disconnect() end
+        if hum then hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true); hum.Sit = false end
+        if hrp then hrp.Velocity, hrp.RotVelocity = Vector3.new(0,0,0), Vector3.new(0,0,0); if BangOriginalPos then hrp.CFrame = BangOriginalPos end end
+        if char then for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = true end end end
+    end
+end})
+BangTab:CreateToggle({ Name = "تفعيل بانق v2 للوجه 😈", CurrentValue = false, Flag = "FaceBangV2", Callback = function(Value)
+    FaceBangV2Enabled = Value
+    local char, hrp, hum = lp.Character, lp.Character and lp.Character:FindFirstChild("HumanoidRootPart"), lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if FaceBangV2Enabled then
+        if not bangTarget or not bangTarget.Character or not bangTarget.Character:FindFirstChild("Head") then FaceBangV2Enabled = false; return end
+        BangOriginalPos = hrp.CFrame; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        FaceBangV2Connection = RunService.Heartbeat:Connect(function()
+            if not FaceBangV2Enabled or not bangTarget.Character or not bangTarget.Character:FindFirstChild("Head") then return end
+            for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = false end end
+            hum.Sit = math.random() > 0.5 
+            hrp.CFrame = bangTarget.Character.Head.CFrame * CFrame.Angles(math.rad(math.random(0,360)), math.rad(math.random(0,360)), math.rad(math.random(0,360)))
+            hrp.Velocity, hrp.RotVelocity = Vector3.new(30000, 30000, 30000), Vector3.new(50000, 50000, 50000)
+        end)
+    else
+        if FaceBangV2Connection then FaceBangV2Connection:Disconnect() end
+        if hum then hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true); hum.Sit = false end
+        if hrp then hrp.Velocity, hrp.RotVelocity = Vector3.new(0,0,0), Vector3.new(0,0,0); if BangOriginalPos then hrp.CFrame = BangOriginalPos end end
+        if char then for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = true end end end
+    end
+end})
+
+FunTab:CreateSection("خيارات المتعة 🎭")
+FunTab:CreateButton({ Name = "انتقل لاماكن عشوائيه بسرفر 🎲", Callback = function()
+    local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    for i = 1, 15 do
+        local raycastParams = RaycastParams.new(); raycastParams.FilterDescendantsInstances = {lp.Character}; raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+        local raycastResult = workspace:Raycast(Vector3.new(math.random(-2000, 2000), 1000, math.random(-2000, 2000)), Vector3.new(0, -2000, 0), raycastParams)
+        if raycastResult and raycastResult.Instance and raycastResult.Instance.CanCollide then
+            hrp.CFrame, hrp.Velocity = CFrame.new(raycastResult.Position + Vector3.new(0, 3, 0)), Vector3.new(0,0,0)
+            Rayfield:Notify({Title = "انتقال عشوائي", Content = "تم نقلك لمكان عشوائي!", Duration = 2})
+            return
+        end
+    end
+end})
+FunTab:CreateButton({ Name = "تحكم بلذي تركبه 🕹️", Callback = function()
+    if lp.PlayerGui:FindFirstChild("ZainControl_V4") then return end
+    local camera = workspace.CurrentCamera
+    local flying = false
+    local speed = 70
+    local moveDir = Vector3.new(0,0,0)
+    local lastSafePos = nil 
+    local antiVoidHeight = -80 
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "ZainControl_V4"
+    gui.ResetOnSpawn = false
+    gui.Parent = lp:WaitForChild("PlayerGui")
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 130, 0, 140)
+    mainFrame.Position = UDim2.new(0.85, 0, 0.1, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    mainFrame.Active = true
+    mainFrame.Parent = gui
+    Instance.new("UICorner", mainFrame)
+    local dragging, dragInput, dragStart, startPos
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 25)
+    title.Text = "Zain control"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 14
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundTransparency = 1
+    title.Parent = mainFrame
+    local flyBtn = Instance.new("TextButton")
+    flyBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    flyBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+    flyBtn.Text = "FLY: OFF"
+    flyBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    flyBtn.TextColor3 = Color3.new(1, 1, 1)
+    flyBtn.Parent = mainFrame
+    Instance.new("UICorner", flyBtn)
+    local speedBox = Instance.new("TextBox")
+    speedBox.Size = UDim2.new(0.9, 0, 0, 25)
+    speedBox.Position = UDim2.new(0.05, 0, 0.5, 0)
+    speedBox.Text = "70"
+    speedBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    speedBox.TextColor3 = Color3.new(1, 1, 1)
+    speedBox.Parent = mainFrame
+    Instance.new("UICorner", speedBox)
+    local exitBtn = Instance.new("TextButton")
+    exitBtn.Size = UDim2.new(0.9, 0, 0, 25)
+    exitBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
+    exitBtn.Text = "REMOVE (X)"
+    exitBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
+    exitBtn.TextColor3 = Color3.new(1, 1, 1)
+    exitBtn.Parent = mainFrame
+    Instance.new("UICorner", exitBtn)
+    local ctrl = Instance.new("Frame")
+    ctrl.Size = UDim2.new(0, 120, 0, 120)
+    ctrl.Position = UDim2.new(0.02, 0, 0.6, 0)
+    ctrl.BackgroundTransparency = 1
+    ctrl.Parent = gui
+    local function makeBtn(pos, txt, dir)
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(0, 35, 0, 35) 
+        b.Position = pos
+        b.BackgroundColor3 = Color3.new(0,0,0)
+        b.BackgroundTransparency = 0.6
+        b.Text = txt
+        b.TextSize = 18
+        b.TextColor3 = Color3.new(1,1,1)
+        b.Parent = ctrl
+        Instance.new("UICorner", b, {CornerRadius = UDim.new(0, 8)})
+        b.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+                moveDir = dir
+                b.BackgroundTransparency = 0.2
+            end
+        end)
+        b.InputEnded:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+                moveDir = Vector3.new(0,0,0)
+                b.BackgroundTransparency = 0.6
+            end
+        end)
+    end
+    makeBtn(UDim2.new(0.35, 0, 0, 0), "▲", Vector3.new(0, 0, -1))
+    makeBtn(UDim2.new(0.35, 0, 0.7, 0), "▼", Vector3.new(0, 0, 1))
+    makeBtn(UDim2.new(0, 0, 0.35, 0), "◀", Vector3.new(-1, 0, 0))
+    makeBtn(UDim2.new(0.7, 0, 0.35, 0), "▶", Vector3.new(1, 0, 0))
+    makeBtn(UDim2.new(1.1, 0, 0, 0), "⏫", Vector3.new(0, 1, 0))
+    makeBtn(UDim2.new(1.1, 0, 0.7, 0), "⏬", Vector3.new(0, -1, 0))
+    local bv, bg
+    local function stop()
+        flying = false
+        flyBtn.Text = "FLY: OFF"
+        flyBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+        if bv then bv:Destroy() bv = nil end
+        if bg then bg:Destroy() bg = nil end
+        if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character.Humanoid.PlatformStand = false
+        end
+    end
+    task.spawn(function()
+        while gui.Parent do
+            local char = lp.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp and hrp.Position.Y > 0 then
+                lastSafePos = hrp.CFrame 
+            end
+            task.wait(1)
+        end
+    end)
+    local function start()
+        local char = lp.Character
+        if not char then return end
+        local target = char:FindFirstChild("HumanoidRootPart")
+        if char:FindFirstChildOfClass("Humanoid") and char:FindFirstChildOfClass("Humanoid").SeatPart then
+            target = char:FindFirstChildOfClass("Humanoid").SeatPart.Parent.PrimaryPart or char:FindFirstChildOfClass("Humanoid").SeatPart
+        end
+        if not target then return end
+        flying = true
+        flyBtn.Text = "FLY: ON"
+        flyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+        bv = Instance.new("BodyVelocity", target)
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bg = Instance.new("BodyGyro", target)
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bg.P = 15000
+        task.spawn(function()
+            while flying and target and bv and bg do
+                bg.CFrame = camera.CFrame
+                if target.Position.Y < antiVoidHeight and lastSafePos then
+                    target.CFrame = lastSafePos
+                    bv.Velocity = Vector3.new(0,0,0)
+                    task.wait(0.1)
+                end
+                if moveDir.Magnitude > 0 then
+                    bv.Velocity = camera.CFrame:VectorToWorldSpace(moveDir) * speed
+                else
+                    bv.Velocity = Vector3.new(0, 0, 0)
+                end
+                RunService.RenderStepped:Wait()
+            end
+        end)
+    end
+    flyBtn.MouseButton1Click:Connect(function()
+        if flying then stop() else start() end
+    end)
+    speedBox.FocusLost:Connect(function() speed = tonumber(speedBox.Text) or 70 end)
+    exitBtn.MouseButton1Click:Connect(function() stop(); gui:Destroy() end)
+end})
+
+AntiTab:CreateSection("نظام الحماية الخارق 🛡️")
+AntiTab:CreateToggle({ Name = "مسح المنطقه 🌪️", CurrentValue = false, Flag = "ClearArea", Callback = function(Value)
+    ClearAreaEnabled = Value
+    local char, hrp, hum = lp.Character, lp.Character and lp.Character:FindFirstChild("HumanoidRootPart"), lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if ClearAreaEnabled then
+        if not hrp then return end
+        ClearAreaOriginalPos = hrp.CFrame; hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        ClearAreaPhysics = RunService.Heartbeat:Connect(function()
+            if not ClearAreaEnabled then return end
+            hrp.Velocity, hrp.RotVelocity = Vector3.new(50000, 50000, 50000), Vector3.new(50000, 50000, 50000)
+            for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = false end end
+        end)
+        ClearAreaThread = task.spawn(function()
+            local angle = 0
+            while ClearAreaEnabled do
+                angle = angle + 5 
+                local radius = math.random(500, 2000)
+                hrp.CFrame = ClearAreaOriginalPos * CFrame.new(math.sin(angle) * radius, math.random(20, 1000), math.cos(angle) * radius) * CFrame.Angles(math.random(), math.random(), math.random())
+                task.wait(0.005) 
+            end
+        end)
+    else
+        if ClearAreaPhysics then ClearAreaPhysics:Disconnect() end
+        if ClearAreaThread then task.cancel(ClearAreaThread) end
+        if char then for _, part in pairs(char:GetChildren()) do if part:IsA("BasePart") then part.CanCollide = true end end end
+        task.wait(0.05)
+        if hrp and ClearAreaOriginalPos then hrp.Velocity, hrp.RotVelocity, hrp.CFrame = Vector3.new(0,0,0), Vector3.new(0,0,0), ClearAreaOriginalPos * CFrame.new(0, 3, 0) end
+        if hum then hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true); hum.Sit = false end
+    end
+end})
+AntiTab:CreateToggle({Name = "مضاد فويد (Infinity Void) 🛡️", CurrentValue = false, Flag = "AntiVoid", Callback = function(Value) workspace.FallenPartsDestroyHeight = Value and -999999999 or -500 end})
+AntiTab:CreateToggle({ Name = "🛡️ مضاد لاج كل ادوات 🛡️", CurrentValue = false, Flag = "GlobalNukeToggle", Callback = function(Value)
+    _G.GlobalPurge = Value
+    if _G.GlobalPurge then
+        settings().Rendering.QualityLevel = 1; game.Lighting.GlobalShadows = false; game.Lighting.Brightness = 1
+        for _, obj in pairs(workspace:GetDescendants()) do AbsoluteNuke(obj) end
+    else game.Lighting.GlobalShadows = true end
+end})
+AntiTab:CreateToggle({ Name = "🌪️ درع الطرد النهائي (Anti-Approach) 🌪️", CurrentValue = false, Flag = "ZainGlobalShield", Callback = function(Value)
+    GlobalGuardianActive = Value
+    if GlobalGuardianActive then
+        task.spawn(function()
+            while GlobalGuardianActive do
+                RunService.Heartbeat:Wait()
+                pcall(function()
+                    local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return end
+                    for _, target in pairs(game.Players:GetPlayers()) do
+                        if target ~= lp and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                            local tHrp = target.Character.HumanoidRootPart
+                            if (hrp.Position - tHrp.Position).Magnitude < 6 then
+                                local oldPos, velocity = hrp.CFrame, hrp.Velocity
+                                hrp.Velocity, hrp.CFrame, hrp.RotVelocity = Vector3.new(0, 5000, 0), tHrp.CFrame, Vector3.new(0, 10000, 0)
+                                task.wait(0.1)
+                                hrp.CFrame, hrp.Velocity, hrp.RotVelocity = oldPos, velocity, Vector3.new(0, 0, 0)
+                            end
+                        end
+                    end
+                end)
+            end
+        end)
+    end
+end})
+AntiTab:CreateToggle({Name = "🛡️ مانع فلينق (شبح + ثبات) 🛡️", CurrentValue = false, Callback = function(v) antiGlitchEnabled = v end})
+AntiTab:CreateToggle({Name = "🚫 مانع الجلوس المطلق (Anti-Sit) 🚫", CurrentValue = false, Callback = function(v) antiSitEnabled = v if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then lp.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Seated, not v) end end})
+AntiTab:CreateToggle({Name = "👻 وضع الشبح الكامل (اختراق الجدران) 👻", CurrentValue = false, Callback = function(v) antiFlingAll = v end})
+
+AntiTab:CreateSection("🌌 نظام النفي والسحق (Insta-Kill) 🌌")
+
+_G.VoidExileActive = false
+
+local function SmartGodMode()
+    pcall(function()
+        local char = lp.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.MaxHealth = 999999
+            hum.Health = 999999
+            hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+            hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            
+            hum.HealthChanged:Connect(function(health)
+                if _G.VoidExileActive and health > 0 and health < 999999 then
+                    hum.Health = 999999
+                elseif health <= 0 then
+                    hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
+                end
+            end)
+        end
+    end)
+end
+
+lp.CharacterAdded:Connect(function()
+    if _G.VoidExileActive then
+        task.wait(1)
+        SmartGodMode()
+    end
+end)
+
+AntiTab:CreateToggle({
+   Name = "(قتل بيسوي بانق🌆)",
+   CurrentValue = false,
+   Flag = "ZainKillBang",
+   Callback = function(Value)
+      _G.VoidExileActive = Value
+      
+      if _G.VoidExileActive then
+          Rayfield:Notify({Title = "Žέήίx ήόνά", Content = "نظام القتل السحيق نشط! 💀", Duration = 3})
+          SmartGodMode()
+          
+          task.spawn(function()
+              while _G.VoidExileActive do
+                  RunService.Heartbeat:Wait()
+                  pcall(function()
+                      local char = lp.Character
+                      local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                      local hum = char and char:FindFirstChildOfClass("Humanoid")
+                      
+                      if not hrp or (hum and hum.Health <= 0) then return end
+
+                      for _, target in pairs(game.Players:GetPlayers()) do
+                          if target ~= lp and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                              local tHrp = target.Character.HumanoidRootPart
+                              local tHum = target.Character:FindFirstChildOfClass("Humanoid")
+                              local dist = (hrp.Position - tHrp.Position).Magnitude
+                              
+                              if dist < 7 and tHum and tHum.Health > 0 then
+                                  local currentCFrame = hrp.CFrame
+                                  local currentVel = hrp.Velocity
+                                  local FarLands = Vector3.new(1000000, -100000, 1000000)
+                                  
+                                  tHrp.Velocity = Vector3.new(0, -1000000, 0)
+                                  tHrp.RotVelocity = Vector3.new(5000, 5000, 5000)
+                                  
+                                  hrp.CFrame = CFrame.new(FarLands)
+                                  tHrp.CFrame = CFrame.new(FarLands)
+                                  
+                                  RunService.RenderStepped:Wait()
+                                  
+                                  hrp.CFrame = currentCFrame
+                                  hrp.Velocity = currentVel
+                              end
+                          end
+                      end
+                  end)
+              end
+          end)
+      else
+          Rayfield:Notify({Title = "Žέήίx ήόνά", Content = "تم إيقاف نظام القتل.", Duration = 2})
+          pcall(function()
+              lp.Character.Humanoid.MaxHealth = 100
+              lp.Character.Humanoid.Health = 100
+          end)
+      end
+   end,
+})
+
+AntiTab:CreateButton({Name = "🔥 جميع المضادات (النظام العربي) 🔥", Callback = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Advanced-Arabic-Protection-System-111187"))() end})
+
+AntiTab:CreateButton({ Name = "Zenix kill ⚡ (واجهة الإعدام)", Callback = function()
+    local TeleportTime = 0
+    local DodgeDepth = -500
+    local DetectionRadius = 8
+    local AntiVoidThreshold = -450
+    local HoverHeight = 2
+    local character = lp.Character or lp.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    local isSystemActive = false
+    local isDodgeDown = false
+    local lastSafeCFrame = hrp.CFrame
+
+    local function instantTeleport(targetCFrame, applyHover)
+        local finalPos = targetCFrame
+        if applyHover then finalPos = targetCFrame * CFrame.new(0, HoverHeight, 0) end
+        hrp.Velocity = Vector3.zero
+        hrp.RotVelocity = Vector3.zero
+        hrp.CFrame = finalPos
+    end
+
+    local function zenixKillAction()
+        if isDodgeDown then return end 
+        isDodgeDown = true
+        workspace.FallenPartsDestroyHeight = -2000
+        instantTeleport(CFrame.new(hrp.Position.X, DodgeDepth, hrp.Position.Z), false)
+        task.wait(0.25) 
+        instantTeleport(lastSafeCFrame, true)
+        workspace.FallenPartsDestroyHeight = -500
+        isDodgeDown = false
+    end
+
+    local gui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+    local btnAuto = Instance.new("TextButton", gui)
+    btnAuto.Size = UDim2.new(0, 200, 0, 40)
+    btnAuto.Position = UDim2.new(0.5, -100, 0.15, 0)
+    btnAuto.Text = "Zenix Auto: OFF"
+    btnAuto.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    btnAuto.TextColor3 = Color3.new(1, 1, 1)
+    btnAuto.Font = Enum.Font.GothamBold
+    btnAuto.TextSize = 16
+    btnAuto.Draggable = true
+
+    local btnKill = Instance.new("TextButton", gui)
+    btnKill.Size = UDim2.new(0, 100, 0, 30)
+    btnKill.Position = UDim2.new(0.5, -50, 0.23, 0)
+    btnKill.Text = "Zenix kill"
+    btnKill.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+    btnKill.TextColor3 = Color3.new(1, 1, 1)
+    btnKill.Font = Enum.Font.GothamBold
+    btnKill.TextSize = 14
+    btnKill.Draggable = true
+
+    local btnClose = Instance.new("TextButton", gui)
+    btnClose.Size = UDim2.new(0, 30, 0, 30)
+    btnClose.Position = UDim2.new(0.5, 110, 0.15, 0)
+    btnClose.Text = "X"
+    btnClose.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btnClose.TextColor3 = Color3.new(1, 1, 1)
+    btnClose.Font = Enum.Font.GothamBold
+    btnClose.TextSize = 14
+
+    btnAuto.MouseButton1Click:Connect(function()
+        isSystemActive = not isSystemActive
+        if isSystemActive then
+            btnAuto.Text = "Zenix Auto: ON"
+            btnAuto.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        else
+            btnAuto.Text = "Zenix Auto: OFF"
+            btnAuto.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+            if isDodgeDown then
+                isDodgeDown = false
+                instantTeleport(lastSafeCFrame, true)
+            end
+        end
+    end)
+
+    btnKill.MouseButton1Click:Connect(function() zenixKillAction() end)
+    btnClose.MouseButton1Click:Connect(function() isSystemActive = false; gui:Destroy() end)
+
+    RunService.Heartbeat:Connect(function()
+        if not gui.Parent then return end
+        if not hrp or not hrp.Parent then return end
+        if hrp.Position.Y > -50 and not isDodgeDown then lastSafeCFrame = hrp.CFrame end
+        if isSystemActive then
+            local isAnyoneNear = false
+            for _, other in pairs(Players:GetPlayers()) do
+                if other ~= lp and other.Character and other.Character:FindFirstChild("HumanoidRootPart") then
+                    local dist = (hrp.Position - other.Character.HumanoidRootPart.Position).Magnitude
+                    if dist < DetectionRadius then isAnyoneNear = true break end
+                end
+            end
+            if isAnyoneNear and not isDodgeDown then
+                isDodgeDown = true
+                workspace.FallenPartsDestroyHeight = -2000
+                instantTeleport(CFrame.new(hrp.Position.X, DodgeDepth, hrp.Position.Z), false)
+            elseif not isAnyoneNear and isDodgeDown then
+                isDodgeDown = false
+                instantTeleport(lastSafeCFrame, true)
+                workspace.FallenPartsDestroyHeight = -500
+            end
+        end
+        if hrp.Position.Y < AntiVoidThreshold and not isDodgeDown then instantTeleport(lastSafeCFrame, true) end
+    end)
+    Rayfield:Notify({Title = "تم التفعيل", Content = "ظهرت واجهة Zenix Kill بالمنتصف!", Duration = 3})
+end})
+
+-- ========== إضافة واجهة Zenix Premium ==========
+do
+    local Player = game.Players.LocalPlayer
+    local PlayerGui = Player:WaitForChild("PlayerGui")
+    local RunService = game:GetService("RunService")
+
+    -- تنظيف النسخ السابقة لضمان عدم التكرار
+    if PlayerGui:FindFirstChild("Zenix_Premium_V4") then
+        PlayerGui.Zenix_Premium_V4:Destroy()
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "Zenix_Premium_V4"
+    ScreenGui.Parent = PlayerGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.IgnoreGuiInset = true 
+
+    -- [[ الزر الطائر (أيقونة السكربت) ]]
+    local ToggleBtn = Instance.new("ImageButton")
+    ToggleBtn.Name = "ZenixToggle"
+    ToggleBtn.Parent = ScreenGui
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 10) -- خلفية سوداء داكنة للأيقونة
+    ToggleBtn.Position = UDim2.new(0, 20, 0.5, -25)
+    ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+    ToggleBtn.Image = "rbxassetid://83416943639197"
+    ToggleBtn.ZIndex = 10
+
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 12)
+    BtnCorner.Parent = ToggleBtn
+
+    -- حواف الأيقونة (تدرج أزرق وأسود)
+    local BtnStroke = Instance.new("UIStroke")
+    BtnStroke.Thickness = 2.5
+    BtnStroke.Color = Color3.new(1,1,1) -- تأمين اللون للألوان المتدرجة
+    BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    BtnStroke.Parent = ToggleBtn
+
+    local BtnStrokeGradient = Instance.new("UIGradient")
+    BtnStrokeGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),        -- أسود
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 170, 255)), -- أزرق مضيء
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))        -- أسود
+    })
+    BtnStrokeGradient.Parent = BtnStroke
+
+    -- [[ الواجهة الرئيسية ]]
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
+    MainFrame.Size = UDim2.new(0, 450, 0, 300) 
+    MainFrame.Visible = false
+    MainFrame.ClipsDescendants = true
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- خلفية سوداء داكنة للواجهة
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 12)
+    MainCorner.Parent = MainFrame
+
+    -- [[ الصورة الخلفية الشفافة للواجهة ]]
+    local BgImage = Instance.new("ImageLabel")
+    BgImage.Name = "BackgroundImage"
+    BgImage.Parent = MainFrame
+    BgImage.Size = UDim2.new(1, 0, 1, 0)
+    BgImage.BackgroundTransparency = 1
+    BgImage.Image = "rbxassetid://83416943639197"
+    BgImage.ImageTransparency = 0.92 -- زدت الشفافية قليلاً لتناسب الخلفية السوداء
+    BgImage.ZIndex = 0 
+
+    -- تأثير موج البحر الداخلي القطري (أسود وأزرق غامق)
+    local BgGradient = Instance.new("UIGradient")
+    BgGradient.Rotation = 225 
+    BgGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),        -- أسود
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 40, 100)),   -- أزرق كحلي غامق للموجة
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))         -- أسود
+    })
+    BgGradient.Parent = MainFrame
+
+    -- حواف الواجهة (أسود وأزرق)
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Thickness = 3
+    MainStroke.Color = Color3.new(1,1,1)
+    MainStroke.Parent = MainFrame
+
+    local MainStrokeGradient = Instance.new("UIGradient")
+    MainStrokeGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),        -- أسود
+        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(0, 100, 255)), -- أزرق
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 0, 0)),      -- أسود
+        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(0, 100, 255)), -- أزرق
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))        -- أسود
+    })
+    MainStrokeGradient.Parent = MainStroke
+
+    -- [[ اسم الواجهة Zenix Hub - أزرق وأسود لامع ]]
+    local Title = Instance.new("TextLabel")
+    Title.Name = "ZenixTitle"
+    Title.Parent = MainFrame
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 10, 0, 5) 
+    Title.Size = UDim2.new(0, 100, 0, 20)
+    Title.Text = "Zenix Hub"
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 14 
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.ZIndex = 2 
+
+    local TitleGradient = Instance.new("UIGradient")
+    TitleGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 180, 255)), -- أزرق فاتح لامع
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 70, 255)),  -- أزرق ملكي
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))        -- أسود
+    })
+    TitleGradient.Parent = Title
+
+    -- [[ زر تجريبي (أسود وأزرق) ]]
+    local SampleBtn = Instance.new("TextButton")
+    SampleBtn.Name = "SampleButton"
+    SampleBtn.Parent = MainFrame
+    SampleBtn.Position = UDim2.new(0.5, -60, 0.5, -20)
+    SampleBtn.Size = UDim2.new(0, 120, 0, 40)
+    SampleBtn.Text = "زر تجريبي"
+    SampleBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 10) -- خلفية داكنة جداً للزر
+    SampleBtn.TextColor3 = Color3.new(1, 1, 1)
+    SampleBtn.Font = Enum.Font.GothamBold
+    SampleBtn.TextSize = 14
+    SampleBtn.ZIndex = 2
+
+    local SampleCorner = Instance.new("UICorner")
+    SampleCorner.CornerRadius = UDim.new(0, 8)
+    SampleCorner.Parent = SampleBtn
+
+    local SampleStroke = Instance.new("UIStroke")
+    SampleStroke.Thickness = 2
+    SampleStroke.Color = Color3.new(1,1,1)
+    SampleStroke.Parent = SampleBtn
+
+    local SampleStrokeGrad = Instance.new("UIGradient")
+    SampleStrokeGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 255)), -- أزرق
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))      -- أسود
+    })
+    SampleStrokeGrad.Parent = SampleStroke
+
+    -- [[ نظام التحريك الناعم ]]
+    local rot = 0
+    local waveTime = 0
+    RunService.RenderStepped:Connect(function(dt)
+        rot = rot + (dt * 50) 
+        waveTime = waveTime + (dt * 0.7) -- تم إبطاء الموجة قليلاً لتناسب الجو الغامق
+        
+        -- دوران الحواف
+        if MainStrokeGradient.Parent then MainStrokeGradient.Rotation = rot end
+        if BtnStrokeGradient.Parent then BtnStrokeGradient.Rotation = rot end
+        if SampleStrokeGrad.Parent then SampleStrokeGrad.Rotation = -rot end
+        
+        -- تحريك موج البحر الخلفي
+        local wave = math.sin(waveTime) * 0.25
+        BgGradient.Offset = Vector2.new(wave, wave)
+    end)
+
+    -- [[ نظام السحب ]]
+    local function makeDraggable(obj)
+        local UserInputService = game:GetService("UserInputService")
+        local dragging, dragInput, dragStart, startPos
+        obj.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                dragStart = input.Position
+                startPos = obj.Position
+            end
+        end)
+        obj.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                dragInput = input
+            end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                local delta = input.Position - dragStart
+                obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+        obj.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = false
+            end
+        end)
+    end
+
+    makeDraggable(ToggleBtn)
+    makeDraggable(MainFrame)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = not MainFrame.Visible
+    end)
+end
